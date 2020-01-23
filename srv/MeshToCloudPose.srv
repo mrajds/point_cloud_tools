@@ -1,0 +1,5 @@
+string mesh_path
+sensor_msgs/PointCloud2 object_cloud
+sensor_msgs/PointCloud2 table_cloud
+---
+geometry_msgs/PoseStamped estimated_pose
