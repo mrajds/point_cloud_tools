@@ -148,8 +148,8 @@ bool MeshFitCloudPoseSrv(point_cloud_tools::MeshToCloudPose::Request &req, point
     0,0,0,1;
     
   icp.align(Final, guess);
-  Final.header.frame_id = "/world";
-  full_object_cloud->header.frame_id = "/world";
+  Final.header.frame_id = "world";
+  full_object_cloud->header.frame_id = "world";
   sensor_msgs::PointCloud2 send_cloud;
   pcl::toROSMsg(*camera_processed_cloud,send_cloud);
   
@@ -161,11 +161,11 @@ bool MeshFitCloudPoseSrv(point_cloud_tools::MeshToCloudPose::Request &req, point
   out_mat = icp.getFinalTransformation();
   
   Eigen::Transform<float, 3, Eigen::Affine> out_trans(out_mat);
-  pcl::getTranslationAndEulerAngles(out_trans, x, y, z, roll, pitch, yaw);
+  pcl::getTranslationAndEulerAngles(out_trans.inverse(), x, y, z, roll, pitch, yaw);
   rot.setRPY(roll,pitch,yaw);
 
   res.estimated_pose.header.stamp = ros::Time::now();
-  res.estimated_pose.header.frame_id = "/world";
+  res.estimated_pose.header.frame_id = "world";
   res.estimated_pose.pose.position.x = x;
   res.estimated_pose.pose.position.y = y;
   res.estimated_pose.pose.position.z = z;
@@ -182,7 +182,7 @@ bool MeshFitCloudPoseSrv(point_cloud_tools::MeshToCloudPose::Request &req, point
       ros::Rate r(10);
       for(int i=0; i<10; i++)
 	{
-	  trans_br.sendTransform(tf::StampedTransform(out_tf, ros::Time::now(),"/ICPTest","/world"));
+	  trans_br.sendTransform(tf::StampedTransform(out_tf, ros::Time::now(),"world","ICPTest"));
 	  r.sleep();
 	}
       align_cloud.publish(send_cloud); 
